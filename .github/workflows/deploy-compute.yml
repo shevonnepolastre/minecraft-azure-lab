@@ -1,0 +1,27 @@
+name: Deploy compute.bicep to Azure
+
+on:
+  push:
+    branches:
+      - main  # or change to your target branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy compute.bicep
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group create \
+              --resource-group MinecraftRG \
+              --template-file compute.bicep
