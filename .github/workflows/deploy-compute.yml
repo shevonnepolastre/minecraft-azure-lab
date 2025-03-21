@@ -24,4 +24,4 @@ jobs:
           inlineScript: |
             az deployment group create \
               --resource-group MinecraftRG \
-              --template-file compute.bicep
+              --template-file infrastructure/compute.bicep
