@@ -25,3 +25,7 @@ jobs:
             az deployment group create \
               --resource-group MinecraftRG \
               --template-file infrastructure/compute.bicep
+
+
+              az login --service-principal -u $project_sp_client_id -p $project_sp_secret_value --tenant $tenant_id
+
