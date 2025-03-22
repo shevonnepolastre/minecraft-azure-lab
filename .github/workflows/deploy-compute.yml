@@ -1,41 +1,30 @@
-name: Deploy compute.bicep to Azure
+name: Deploy Linux VM with Bicep
 
-on: [push]
-
-permissions:
-  id-token: write
-  contents: read
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  deploy-vm:
+    name: Deploy Linux VM
     runs-on: ubuntu-latest
-    env:
-      OUTPUT_PATH: ${{ github.workspace }}
 
     steps:
-      # 1) Check out the repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # 2) Log into Azure
       - name: Azure Login
-        uses: azure/login@v2
+        uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # 3) Deploy Bicep file
-      - name: Deploy bicep
-        uses: azure/arm-deploy@v1
-        with:
-          subscriptionId: 3d36185b-63ee-4012-b04c-98a78f4bf5d7
-          resourceGroupName: MinecraftRG
-          template: ./infrastructure/compute.bicep
-          parameters: |
-            # If your Bicep expects parameters, 
-            # pass them in the format:
-            # paramName1=paramValue1
-            # paramName2=paramValue2
-          # Optional inputs you can add if needed:
-          # deploymentName: DeployCompute
-          # deploymentScope: resourceGroup
-          # deploymentMode: Incremental
+      - name: Deploy compute.bicep to Minecraft RG
+        run: |
+          az deployment group create \
+            --name linuxVmDeployment \
+            --resource-group "Minecraft RG" \
+            --template-file infrastructure/compute.bicep \
+            --parameters @infrastructure/compute.parameters.json \
+            --subscription 3d36185b-63ee-4012-b04c-98a78f4bf5d7

@@ -1,8 +1,8 @@
 @description('The name of your Virtual Machine.')
-param vmName string = 'MinecraftLinuxVM'
+param vmName string = 'simpleLinuxVM'
 
 @description('Username for the Virtual Machine.')
-param adminUsername string = 'MCAdmin'
+param adminUsername string
 
 @description('Type of authentication to use on the Virtual Machine. SSH key is recommended.')
 @allowed([
@@ -13,7 +13,7 @@ param authenticationType string = 'password'
 
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
-param adminPasswordOrKey string = 'Panama@20202020'
+param adminPasswordOrKey string
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
 param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
@@ -32,13 +32,13 @@ param location string = resourceGroup().location
 param vmSize string = 'Standard_D2s_v3'
 
 @description('Name of the VNET')
-param virtualNetworkName string = 'MCvNet'
+param virtualNetworkName string = 'vNet'
 
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'MCSubnet'
+param subnetName string = 'Subnet'
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'MCSecGroupNet'
+param networkSecurityGroupName string = 'SecGroupNet'
 
 @description('Security Type of the Virtual Machine.')
 @allowed([

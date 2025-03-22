@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmName": {
+        "value": "minecraft-vm"
+      },
+      "adminUsername": {
+        "value": "mcadmin"
+      },
+      "authenticationType": {
+        "value": "sshPublicKey"
+      },
+      "adminPasswordOrKey": {
+        "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC7..."  // Replace with your real public key
+      },
+      "ubuntuOSVersion": {
+        "value": "Ubuntu-2204"
+      },
+      "location": {
+        "value": "southcentralus"
+      },
+      "vmSize": {
+        "value": "Standard_B2s"
+      },
+      "virtualNetworkName": {
+        "value": "minecraftVNet"
+      },
+      "subnetName": {
+        "value": "minecraftSubnet"
+      },
+      "networkSecurityGroupName": {
+        "value": "minecraftNSG"
+      },
+      "securityType": {
+        "value": "TrustedLaunch"
+      }
+    }
+  }
+  
