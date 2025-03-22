@@ -9,7 +9,7 @@ param adminUsername string = "MCAdmin"
   'sshPublicKey'
   'password'
 ])
-param authenticationType string = 'sshPublicKey'
+param authenticationType string = 'password'
 
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
