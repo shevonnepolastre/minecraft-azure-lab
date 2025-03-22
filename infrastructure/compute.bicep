@@ -2,7 +2,7 @@
 param vmName string = 'MinecraftLinuxVM'
 
 @description('Username for the Virtual Machine.')
-param adminUsername string = "MCAdmin"
+param adminUsername string = 'MCAdmin'
 
 @description('Type of authentication to use on the Virtual Machine. SSH key is recommended.')
 @allowed([
@@ -13,7 +13,7 @@ param authenticationType string = 'password'
 
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
-param adminPasswordOrKey string = "Panama@20202020"
+param adminPasswordOrKey string = 'Panama@20202020'
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
 param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
