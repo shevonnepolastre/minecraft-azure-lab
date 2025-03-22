@@ -16,7 +16,7 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+          creds: ${{ secrets.LINUX_VM_SECRET }}
 
       - name: Deploy compute.bicep
         uses: azure/cli@v1
@@ -25,6 +25,16 @@ jobs:
             az deployment group create \
               --resource-group MinecraftRG \
               --template-file infrastructure/compute.bicep
+
+      - name: Deploy Bicep file
+          run: |
+            az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file ./main.bicep \
+            --parameters adminUsername='MCAdmin' \
+                   authenticationType='password' \
+                   adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
+
 
 
               az login --service-principal -u $project_sp_client_id -p $project_sp_secret_value --tenant $tenant_id
