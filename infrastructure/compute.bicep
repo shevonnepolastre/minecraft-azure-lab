@@ -1,8 +1,8 @@
 @description('The name of your Virtual Machine.')
-param vmName string = 'MCVM1'
+param vmName string = 'MinecraftLinuxVM'
 
 @description('Username for the Virtual Machine.')
-param adminUsername string
+param adminUsername string = "MCAdmin"
 
 @description('Type of authentication to use on the Virtual Machine. SSH key is recommended.')
 @allowed([
@@ -13,7 +13,7 @@ param authenticationType string = 'password'
 
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
-param adminPasswordOrKey string
+param adminPasswordOrKey string = "Panama@20202020"
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
 param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
@@ -35,7 +35,7 @@ param vmSize string = 'Standard_D2s_v3'
 param virtualNetworkName string = 'MCvNet'
 
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'MineCraftSubnet'
+param subnetName string = 'MCSubnet'
 
 @description('Name of the Network Security Group')
 param networkSecurityGroupName string = 'MCSecGroupNet'
@@ -96,7 +96,7 @@ resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
   properties: {
     ipConfigurations: [
       {
-        name: 'MCipconfig1'
+        name: 'ipconfig1'
         properties: {
           subnet: {
             id: virtualNetwork.properties.subnets[0].id
