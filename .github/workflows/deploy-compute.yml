@@ -1,33 +1,41 @@
 name: Deploy compute.bicep to Azure
 
-on:
-  push:
-    branches:
-      - main  # Change if needed
+on: [push]
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
-
     env:
-      RESOURCE_GROUP: MinecraftRG
+      OUTPUT_PATH: ${{ github.workspace }}
 
     steps:
+      # 1) Check out the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2) Log into Azure
       - name: Azure Login
-        uses: azure/login@v1
+        uses: azure/login@v2
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Should be the SP JSON, not the password
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy compute.bicep
-        uses: azure/cli@v1
+      # 3) Deploy Bicep file
+      - name: Deploy bicep
+        uses: azure/arm-deploy@v1
         with:
-          inlineScript: |
-            az deployment group create \
-              --resource-group $RESOURCE_GROUP \
-              --template-file infrastructure/compute.bicep \
-              --parameters adminUsername='MCAdmin' \
-                           authenticationType='password' \
-                           adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
+          subscriptionId: 3d36185b-63ee-4012-b04c-98a78f4bf5d7
+          resourceGroupName: MinecraftRG
+          template: ./infrastructure/compute.bicep
+          parameters: |
+            # If your Bicep expects parameters, 
+            # pass them in the format:
+            # paramName1=paramValue1
+            # paramName2=paramValue2
+          # Optional inputs you can add if needed:
+          # deploymentName: DeployCompute
+          # deploymentScope: resourceGroup
+          # deploymentMode: Incremental
