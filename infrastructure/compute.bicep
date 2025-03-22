@@ -2,7 +2,7 @@
 param vmName string = 'MCVM1'
 
 @description('Username for the Virtual Machine.')
-param adminUsername string = "MCAdmin"
+param adminUsername string
 
 @description('Type of authentication to use on the Virtual Machine. SSH key is recommended.')
 @allowed([
