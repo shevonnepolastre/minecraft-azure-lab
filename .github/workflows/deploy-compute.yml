@@ -33,7 +33,7 @@ jobs:
             --template-file ./main.bicep \
             --parameters adminUsername='MCAdmin' \
                    authenticationType='password' \
-                   adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
+                   adminPasswordOrKey='${{ secrets.LINUX_VM_SECRET }}'
 
 
 
