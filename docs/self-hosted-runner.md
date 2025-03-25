@@ -39,3 +39,4 @@ This guide walks you through the process of creating and configuring a self-host
   - Check the "Runners" section
   - Your new self-hosted runner should now be listed and ready to use
 
+![Runner-Success](runner-success.png)
