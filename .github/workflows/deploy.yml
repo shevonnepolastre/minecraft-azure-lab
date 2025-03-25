@@ -1,11 +1,10 @@
 name: Deploy Linux VM with Bicep
 
+# Trigger the workflow on push
+on: 
+  push:
 
-# Triggers the workflow on push 
-
-on: push  
-
-# Environment variables
+# Global environment variables
 env:
   AZURE_RESOURCE_GROUP: 'minecraftRG'
   AZURE_LOCATION: 'eastus2'
@@ -18,34 +17,29 @@ permissions:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Run Bicep linter
-      run: az bicep build --file deploy/main.bicep
-        
-  validate:
+    name: Lint Bicep Files
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: azure/login@v1
-    name: Sign in to Azure
-    run: |
-          echo "${{ secrets.AZURE_CREDENTIALS }}" > azure_credentials.json
-          CLIENT_ID=$(jq -r '.clientId' azure_credentials.json)
-          SUBSCRIPTION_ID=$(jq -r '.subscriptionId' azure_credentials.json)
-          TENANT_ID=$(jq -r '.tenantId' azure_credentials.json)
-          echo "Client ID: $CLIENT_ID"
-        env:
-          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Run Bicep linter
+        run: az bicep build --file deploy/main.bicep
 
-      
-      # Deploy Bicep file
-    uses: azure/cli@v1
+  validate-and-deploy:
+    name: Validate and Deploy Bicep
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Bicep Template
+        uses: azure/cli@v1
         with:
           inlineScript: |
             az deployment group create \
-              --resource-group YOUR_RESOURCE_GROUP_NAME \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
               --template-file infrastructure/compute.bicep \
               --parameters adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
-      
