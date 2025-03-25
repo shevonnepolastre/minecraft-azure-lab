@@ -1,16 +1,13 @@
 name: Deploy Linux VM with Bicep
 
-# Trigger the workflow on push
-on: 
+on:
   push:
 
-# Global environment variables
 env:
   AZURE_RESOURCE_GROUP: 'minecraftRG'
   AZURE_LOCATION: 'eastus2'
   VM_NAME: 'minecraft-linux'
 
-# Permissions needed for Azure authentication
 permissions:
   id-token: write
   contents: read
@@ -44,14 +41,14 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-          - name: Deploy compute.bicep with parameters
-          uses: azure/cli@v1
-          with:
-            inlineScript: |
-              az deployment group create \
-                --resource-group YOUR_RESOURCE_GROUP \
-                --template-file infrastructure/compute.bicep \
-                --parameters @infrastructure/compute-parameters.json
+      - name: Deploy compute.bicep with parameters
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group create \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --template-file infrastructure/compute.bicep \
+              --parameters @infrastructure/compute-parameters.json
 
       - name: Verify VM Deployment
         run: |
