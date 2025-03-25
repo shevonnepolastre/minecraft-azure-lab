@@ -44,14 +44,14 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Deploy Bicep Template
-        run: |
-          az deployment group create \
-            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-            --template-file ./infra/main.bicep \
-            --parameters \
-              vmName=${{ env.VM_NAME }} \
-              adminPassword="${{ secrets.VM_ADMIN_PASSWORD }}"
+          - name: Deploy compute.bicep with parameters
+          uses: azure/cli@v1
+          with:
+            inlineScript: |
+              az deployment group create \
+                --resource-group YOUR_RESOURCE_GROUP \
+                --template-file infrastructure/compute.bicep \
+                --parameters @infrastructure/compute-parameters.json
 
       - name: Verify VM Deployment
         run: |
