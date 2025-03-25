@@ -16,30 +16,34 @@ permissions:
   contents: read
 
 jobs:
-  lint:
-    name: Lint Bicep Files
+  lint-and-validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Run Bicep linter
-        run: az bicep build --file deploy/main.bicep
+      - uses: actions/checkout@v4
 
-  validate-and-deploy:
-    name: Validate and Deploy Bicep
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
+      # Install Azure CLI and Bicep
+      - name: Install Azure CLI and Bicep
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+          az bicep install
 
-      - name: Azure Login
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # Run Bicep linter
+      - name: Lint Bicep Files
+        run: az bicep build --file ./infra/main.bicep
 
-      - name: Deploy Bicep Template
-        uses: azure/cli@v1
-        with:
-          inlineScript: |
-            az deployment group create \
-              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-              --template-file infrastructure/compute.bicep \
-              --parameters adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
+     # Deploy Bicep template
+     - name: Deploy Bicep Template
+     run: |
+       az deployment group create \
+         --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+         --template-file ./infra/main.bicep \
+         --parameters \
+           vmName=${{ env.VM_NAME }} \
+           adminPassword="${{ secrets.VM_ADMIN_PASSWORD }}"
+
+      # Optional: Add a step to verify VM deployment
+      - name: Verify VM Deployment
+        run: |
+          az vm list \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "[?name=='${{ env.VM_NAME }}']"
