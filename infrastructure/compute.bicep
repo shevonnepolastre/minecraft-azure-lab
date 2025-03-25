@@ -1,5 +1,5 @@
 @description('The name of your Virtual Machine.')
-param vmName string = 'simpleLinuxVM'
+param vmName string = 'MinecraftVM'
 
 @description('Username for the Virtual Machine.')
 param adminUsername string
@@ -13,7 +13,7 @@ param authenticationType string = 'password'
 
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
-param adminPasswordOrKey string
+param adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
 
 @description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
 param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
@@ -29,16 +29,16 @@ param ubuntuOSVersion string = 'Ubuntu-2004'
 param location string = resourceGroup().location
 
 @description('The size of the VM')
-param vmSize string = 'Standard_D2s_v3'
+param vmSize string = 'Standard_D4s_v3'
 
 @description('Name of the VNET')
-param virtualNetworkName string = 'vNet'
+param virtualNetworkName string = 'MinecrafvNet'
 
 @description('Name of the subnet in the virtual network')
-param subnetName string = 'Subnet'
+param subnetName string = 'MinecraftSubnet'
 
 @description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'SecGroupNet'
+param networkSecurityGroupName string = 'MCSecGroupNet'
 
 @description('Security Type of the Virtual Machine.')
 @allowed([
@@ -131,7 +131,32 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-0
           destinationAddressPrefix: '*'
           destinationPortRange: '22'
         }
+
+        name: 'AllowAny25565Inbound'
+        properties: {
+          priority: 310
+          protocol: 'Tcp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '0.0.0.0/0'
+          destinationPortRange: '25565
+        }
+
+        name: 'AllowAny19132Inbound'
+        properties: {
+          priority: 100
+          protocol: 'Udp'
+          access: 'Allow'
+          direction: 'Inbound'
+          sourceAddressPrefix: '*'
+          sourcePortRange: '*'
+          destinationAddressPrefix: '*'
+          destinationPortRange: '19132
+        }
       }
+      
     ]
   }
 }
@@ -149,6 +174,9 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
       {
         name: subnetName
         properties: {
+          networkSecurityGroup: {
+            id: networkSecurityGroup.id
+          }
           addressPrefix: subnetAddressPrefix
           privateEndpointNetworkPolicies: 'Enabled'
           privateLinkServiceNetworkPolicies: 'Enabled'

@@ -40,13 +40,13 @@ jobs:
         env:
           AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Deploy Bicep template
-      deploy:
-        runs-on: ubuntu-latest
-        needs: [lint, validate]
-        steps:
-          - uses: actions/checkout@v3
-          - uses: azure/login@v1
-      name: Sign in to Azure
-
+      
+      # Deploy Bicep file
+    uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group create \
+              --resource-group YOUR_RESOURCE_GROUP_NAME \
+              --template-file infrastructure/compute.bicep \
+              --parameters adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
       
