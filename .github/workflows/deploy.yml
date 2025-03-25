@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   lint:
+    name: Lint Bicep Templates
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
@@ -30,17 +31,28 @@ jobs:
           analyse-all-files: "true"
           bicep-version: "latest"
 
-     # Deploy Bicep template
-     - name: Deploy Bicep Template
-     run: |
-       az deployment group create \
-         --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
-         --template-file ./infra/main.bicep \
-         --parameters \
-           vmName=${{ env.VM_NAME }} \
-           adminPassword="${{ secrets.VM_ADMIN_PASSWORD }}"
+  deploy:
+    name: Deploy Bicep Template
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      # Optional: Add a step to verify VM deployment
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Bicep Template
+        run: |
+          az deployment group create \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --template-file ./infra/main.bicep \
+            --parameters \
+              vmName=${{ env.VM_NAME }} \
+              adminPassword="${{ secrets.VM_ADMIN_PASSWORD }}"
+
       - name: Verify VM Deployment
         run: |
           az vm list \
