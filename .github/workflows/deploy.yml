@@ -3,8 +3,7 @@ name: Deploy Linux VM with Bicep
 
 # Triggers the workflow on push 
 
-on:[push]
-  
+on: push  
 
 # Environment variables
 env:
