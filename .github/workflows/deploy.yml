@@ -16,20 +16,19 @@ permissions:
   contents: read
 
 jobs:
-  lint-and-validate:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      # Install Azure CLI and Bicep
-      - name: Install Azure CLI and Bicep
-        run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-          az bicep install
-
-      # Run Bicep linter
-      - name: Lint Bicep Files
-        run: az bicep build --file ./infra/main.bicep
+      - name: Run Bicep Linter
+        uses: synergy-au/bicep-lint-action@v1
+        with:
+          analyse-all-files: "true"
+          bicep-version: "latest"
 
      # Deploy Bicep template
      - name: Deploy Bicep Template
