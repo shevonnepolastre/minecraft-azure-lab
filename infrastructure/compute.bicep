@@ -1,120 +1,28 @@
-@description('The name of your Virtual Machine.')
-param vmName string = 'MinecraftVM'
+// Parameters
+@description('Name of the Virtual Machine')
+param vmName string = 'mcvm'
 
-@description('Username for the Virtual Machine.')
-param adminUsername string
+@description('Username for the Virtual Machine')
+param adminUsername string = 'mcadmin'
 
-@description('Type of authentication to use on the Virtual Machine. SSH key is recommended.')
-@allowed([
-  'sshPublicKey'
-  'password'
-])
-param authenticationType string = 'password'
+@description('Size of the Virtual Machine')
+param vmSize string = 'Standard_B2s'
 
-@description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
-@secure()
-param adminPasswordOrKey='${{ secrets.ADMIN_PASSWORD }}'
+@description('Ubuntu version')
+param ubuntuOSVersion string = '22.04-LTS'
 
-@description('Unique DNS Name for the Public IP used to access the Virtual Machine.')
-param dnsLabelPrefix string = toLower('${vmName}-${uniqueString(resourceGroup().id)}')
-
-@description('The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version.')
-@allowed([
-  'Ubuntu-2004'
-  'Ubuntu-2204'
-])
-param ubuntuOSVersion string = 'Ubuntu-2004'
-
-@description('Location for all resources.')
+@description('Location for all resources')
 param location string = resourceGroup().location
 
-@description('The size of the VM')
-param vmSize string = 'Standard_D4s_v3'
+// Variables
+var networkInterfaceName = '${vmName}-nic'
+var virtualNetworkName = '${vmName}-vnet'
+var subnetName = 'default'
+var networkSecurityGroupName = '${vmName}-nsg'
+var publicIPAddressName = '${vmName}-pip'
 
-@description('Name of the VNET')
-param virtualNetworkName string = 'MinecrafvNet'
-
-@description('Name of the subnet in the virtual network')
-param subnetName string = 'MinecraftSubnet'
-
-@description('Name of the Network Security Group')
-param networkSecurityGroupName string = 'MCSecGroupNet'
-
-@description('Security Type of the Virtual Machine.')
-@allowed([
-  'Standard'
-  'TrustedLaunch'
-])
-param securityType string = 'TrustedLaunch'
-
-var imageReference = {
-  'Ubuntu-2004': {
-    publisher: 'Canonical'
-    offer: '0001-com-ubuntu-server-focal'
-    sku: '20_04-lts-gen2'
-    version: 'latest'
-  }
-  'Ubuntu-2204': {
-    publisher: 'Canonical'
-    offer: '0001-com-ubuntu-server-jammy'
-    sku: '22_04-lts-gen2'
-    version: 'latest'
-  }
-}
-var publicIPAddressName = '${vmName}PublicIP'
-var networkInterfaceName = '${vmName}NetInt'
-var osDiskType = 'Standard_LRS'
-var subnetAddressPrefix = '10.1.0.0/24'
-var addressPrefix = '10.1.0.0/16'
-var linuxConfiguration = {
-  disablePasswordAuthentication: true
-  ssh: {
-    publicKeys: [
-      {
-        path: '/home/${adminUsername}/.ssh/authorized_keys'
-        keyData: adminPasswordOrKey
-      }
-    ]
-  }
-}
-var securityProfileJson = {
-  uefiSettings: {
-    secureBootEnabled: true
-    vTpmEnabled: true
-  }
-  securityType: securityType
-}
-var extensionName = 'GuestAttestation'
-var extensionPublisher = 'Microsoft.Azure.Security.LinuxAttestation'
-var extensionVersion = '1.0'
-var maaTenantName = 'GuestAttestation'
-var maaEndpoint = substring('emptystring', 0, 0)
-
-resource networkInterface 'Microsoft.Network/networkInterfaces@2023-09-01' = {
-  name: networkInterfaceName
-  location: location
-  properties: {
-    ipConfigurations: [
-      {
-        name: 'ipconfig1'
-        properties: {
-          subnet: {
-            id: virtualNetwork.properties.subnets[0].id
-          }
-          privateIPAllocationMethod: 'Dynamic'
-          publicIPAddress: {
-            id: publicIPAddress.id
-          }
-        }
-      }
-    ]
-    networkSecurityGroup: {
-      id: networkSecurityGroup.id
-    }
-  }
-}
-
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-01' = {
+// Network Security Group
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -156,37 +64,12 @@ resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-09-0
           destinationPortRange: '19132
         }
       }
-      
     ]
   }
 }
 
-resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-09-01' = {
-  name: virtualNetworkName
-  location: location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [
-        addressPrefix
-      ]
-    }
-    subnets: [
-      {
-        name: subnetName
-        properties: {
-          networkSecurityGroup: {
-            id: networkSecurityGroup.id
-          }
-          addressPrefix: subnetAddressPrefix
-          privateEndpointNetworkPolicies: 'Enabled'
-          privateLinkServiceNetworkPolicies: 'Enabled'
-        }
-      }
-    ]
-  }
-}
-
-resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
+// Public IP
+resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
   name: publicIPAddressName
   location: location
   sku: {
@@ -194,29 +77,91 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-09-01' = {
   }
   properties: {
     publicIPAllocationMethod: 'Dynamic'
-    publicIPAddressVersion: 'IPv4'
-    dnsSettings: {
-      domainNameLabel: dnsLabelPrefix
-    }
-    idleTimeoutInMinutes: 4
   }
 }
 
-resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
+// Virtual Network
+resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-04-01' = {
+  name: virtualNetworkName
+  location: location
+  properties: {
+    addressSpace: {
+      addressPrefixes: [
+        '10.0.0.0/16'
+      ]
+    }
+    subnets: [
+      {
+        name: subnetName
+        properties: {
+          addressPrefix: '10.0.0.0/24'
+          networkSecurityGroup: {
+            id: networkSecurityGroup.id
+          }
+        }
+      }
+    ]
+  }
+}
+
+// Network Interface
+resource networkInterface 'Microsoft.Network/networkInterfaces@2023-04-01' = {
+  name: networkInterfaceName
+  location: location
+  properties: {
+    ipConfigurations: [
+      {
+        name: 'ipconfig1'
+        properties: {
+          privateIPAllocationMethod: 'Dynamic'
+          publicIPAddress: {
+            id: publicIPAddress.id
+          }
+          subnet: {
+            id: virtualNetwork.properties.subnets[0].id
+          }
+        }
+      }
+    ]
+  }
+}
+
+// Linux Virtual Machine
+resource linuxVM 'Microsoft.Compute/virtualMachines@2023-03-01' = {
   name: vmName
   location: location
   properties: {
     hardwareProfile: {
       vmSize: vmSize
     }
+    osProfile: {
+      computerName: vmName
+      adminUsername: adminUsername
+      linuxConfiguration: {
+        disablePasswordAuthentication: false
+        ssh: {
+          publicKeys: [
+            {
+              path: '/home/${adminUsername}/.ssh/authorized_keys'
+              keyData: '' // Replace with your SSH public key
+            }
+          ]
+        }
+      }
+    }
     storageProfile: {
+      imageReference: {
+        publisher: 'Canonical'
+        offer: 'UbuntuServer'
+        sku: ubuntuOSVersion
+        version: 'latest'
+      }
       osDisk: {
         createOption: 'FromImage'
         managedDisk: {
-          storageAccountType: osDiskType
+          storageAccountType: 'Standard_LRS'
         }
       }
-      imageReference: imageReference[ubuntuOSVersion]
     }
     networkProfile: {
       networkInterfaces: [
@@ -225,37 +170,10 @@ resource vm 'Microsoft.Compute/virtualMachines@2023-09-01' = {
         }
       ]
     }
-    osProfile: {
-      computerName: vmName
-      adminUsername: adminUsername
-      adminPassword: adminPasswordOrKey
-      linuxConfiguration: ((authenticationType == 'password') ? null : linuxConfiguration)
-    }
-    securityProfile: (securityType == 'TrustedLaunch') ? securityProfileJson : null
   }
 }
 
-resource vmExtension 'Microsoft.Compute/virtualMachines/extensions@2023-09-01' = if (securityType == 'TrustedLaunch' && securityProfileJson.uefiSettings.secureBootEnabled && securityProfileJson.uefiSettings.vTpmEnabled) {
-  parent: vm
-  name: extensionName
-  location: location
-  properties: {
-    publisher: extensionPublisher
-    type: extensionName
-    typeHandlerVersion: extensionVersion
-    autoUpgradeMinorVersion: true
-    enableAutomaticUpgrade: true
-    settings: {
-      AttestationConfig: {
-        MaaSettings: {
-          maaEndpoint: maaEndpoint
-          maaTenantName: maaTenantName
-        }
-      }
-    }
-  }
-}
-
+// Outputs
+output vmId string = linuxVM.id
 output adminUsername string = adminUsername
-output hostname string = publicIPAddress.properties.dnsSettings.fqdn
-output sshCommand string = 'ssh ${adminUsername}@${publicIPAddress.properties.dnsSettings.fqdn}'
+output publicIPAddress string = publicIPAddress.properties.ipAddress
