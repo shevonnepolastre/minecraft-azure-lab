@@ -1,0 +1,52 @@
+name: Deploy Linux VM with Bicep
+
+
+# Triggers the workflow on push 
+
+on:[push]
+  
+
+# Environment variables
+env:
+  AZURE_RESOURCE_GROUP: 'minecraftRG'
+  AZURE_LOCATION: 'eastus2'
+  VM_NAME: 'minecraft-linux'
+
+# Permissions needed for Azure authentication
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run Bicep linter
+      run: az bicep build --file deploy/main.bicep
+        
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: azure/login@v1
+    name: Sign in to Azure
+    run: |
+          echo "${{ secrets.AZURE_CREDENTIALS }}" > azure_credentials.json
+          CLIENT_ID=$(jq -r '.clientId' azure_credentials.json)
+          SUBSCRIPTION_ID=$(jq -r '.subscriptionId' azure_credentials.json)
+          TENANT_ID=$(jq -r '.tenantId' azure_credentials.json)
+          echo "Client ID: $CLIENT_ID"
+        env:
+          AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Deploy Bicep template
+      deploy:
+        runs-on: ubuntu-latest
+        needs: [lint, validate]
+        steps:
+          - uses: actions/checkout@v3
+          - uses: azure/login@v1
+      name: Sign in to Azure
+
+      
