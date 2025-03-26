@@ -97,14 +97,15 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   properties: {
     addressSpace: {
       addressPrefixes: [
-        '10.0.0.0/16'
+        '' //add your IP here 
       ]
     }
     subnets: [
       {
         name: subnetName
         properties: {
-          addressPrefix: '10.0.0.0/24'
+          addressPrefix: '' //add your IP here 
+      ]
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
