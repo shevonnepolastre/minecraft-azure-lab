@@ -1,0 +1,57 @@
+name: Deploy Linux VM with Bicep
+
+on:
+  push:
+
+env:
+  AZURE_RESOURCE_GROUP: 'minecraftRG'
+  AZURE_LOCATION: 'eastus2'
+  VM_NAME: 'minecraft-linux'
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  lint:
+    name: Lint Bicep Templates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Run Bicep Linter
+        uses: synergy-au/bicep-lint-action@v1
+        with:
+          analyse-all-files: "true"
+          bicep-version: "latest"
+
+  deploy:
+    name: Deploy Bicep Template
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy compute.bicep with parameters
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az deployment group create \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --template-file infrastructure/compute.bicep \
+              --parameters @infrastructure/compute-parameters.json
+
+      - name: Verify VM Deployment
+        run: |
+          az vm list \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --query "[?name=='${{ env.VM_NAME }}']"
