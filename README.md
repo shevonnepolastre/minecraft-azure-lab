@@ -82,3 +82,6 @@ The folder structure is as follows:
 - yaml-files - The actual yaml files.  I did not want to put it in the .github/workflows so it wouldn't trigger a runner 
 - .gitignore - Files to ignore 
 
+## Installing Minecraft Server Steps
+
+Here are the [steps](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/compute_install_steps.md) that I used to install Minecraft. 
