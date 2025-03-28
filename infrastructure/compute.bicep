@@ -1,6 +1,6 @@
 // Parameters
 @description('Name of the Virtual Machine')
-param vmName string = 'mcvm'
+param vmName string = 'minecraft-vm'
 
 @description('Username for the Virtual Machine')
 param adminUsername string = 'mcadmin'
@@ -8,12 +8,14 @@ param adminUsername string = 'mcadmin'
 @description('Size of the Virtual Machine')
 param vmSize string = 'Standard_B2s'
 
-@description('Ubuntu version SKU (e.g., 20_04-lts, 22_04-lts)')
+@description('Ubuntu version SKU (e.g., 20_04-lts, 22_04-lts)') //Check the region that you are in cause that will change the available versions
 @allowed([
   '20_04-lts'
   '22_04-lts'
+  '24_04-lts'
+  '18.04-lts'
 ])
-param ubuntuOSVersion string = '22_04-lts'
+param ubuntuOSVersion string = '18.04-lts'
 
 @description('Location for all resources')
 param location string = resourceGroup().location
@@ -30,7 +32,7 @@ var networkSecurityGroupName = '${vmName}-nsg'
 var publicIPAddressName = '${vmName}-pip'
 
 // Network Security Group
-resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {
+resource networkSecurityGroup 'Microsoft.Network/networkSecurityGroups@2023-04-01' = {  /add the Minecraft ports here. 
   name: networkSecurityGroupName
   location: location
   properties: {
@@ -86,9 +88,10 @@ resource publicIPAddress 'Microsoft.Network/publicIPAddresses@2023-04-01' = {
     name: 'Basic'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
+    publicIPAllocationMethod: 'Static'  // ← change to Static
   }
 }
+
 
 // Virtual Network
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-04-01' = {
@@ -97,15 +100,14 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-04-01' = {
   properties: {
     addressSpace: {
       addressPrefixes: [
-        '' //add your IP here 
+        '10.0.0.0/16'
       ]
     }
     subnets: [
       {
         name: subnetName
         properties: {
-          addressPrefix: '' //add your IP here 
-      ]
+          addressPrefix: '10.0.0.0/24'
           networkSecurityGroup: {
             id: networkSecurityGroup.id
           }
