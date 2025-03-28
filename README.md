@@ -74,5 +74,11 @@ If you enjoy Minecraft and want to learn Azure in a practical, hands-on way, thi
 The folder structure is as follows:
 
 - .github/workflows - Where you place your yaml logs
-- .vscode - F
+- configs
+- docker
+- docs - Additional documentation on the server 
+- infrastructure - Holds the bicep and parameters files 
+- scripts - Any other scripts created 
+- yaml-files - The actual yaml files.  I did not want to put it in the .github/workflows so it wouldn't trigger a runner 
+- .gitignore - Files to ignore 
 
