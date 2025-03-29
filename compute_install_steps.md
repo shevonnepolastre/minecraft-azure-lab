@@ -55,4 +55,6 @@ java -Xmx1024M -Xms1024M -jar server.jar nogui
 
 You can find some [details here](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/installing-shader-packs.md).
 
+### 6. Install Geyser MC for Cross Playing with Bedrock Players
 
+Guide [here](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/bedrock-support.md). 
