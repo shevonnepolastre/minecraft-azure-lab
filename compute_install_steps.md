@@ -5,7 +5,7 @@ This guide documents the steps I took to create a Minecraft server as part of my
 ---
 ## 🔧 Setup Steps
 
-### 0. ** Add Azure Credentials and Linux VM Passwords as GitHub Secrets***
+### 0. Add Azure Credentials and Linux VM Passwords as GitHub Secret
 You can use this [guide](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/add-azure-secret-to-github.md) I created 
 ### 1. **Provision Azure Virtual Machine**
 - **Image Used**: Ubuntu 22.04 LTS
@@ -16,11 +16,11 @@ You can use this [guide](https://github.com/shevonnepolastre/minecraft-azure-lab
 
 This was done using [Bicep](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/infrastructure/compute.bicep) and [GitHub Actions](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/yaml-files/deploy-linux-vm.md)
 
-### 2. ** Install Java **
+### 2. Install Java
 
 After the VM gets configured, SSH to connect to the VM and install [Java](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/updating%20to%20java%2021%20sdk.md)
 
-### 3. ** Install Minecraft Server file
+### 3. Install Minecraft Server file
 
 The extension is ".jar" and you will want to use 
 
@@ -43,7 +43,7 @@ You can also use nano by using:
 nano eula.txt
 ```
 
-### 4. ** Launch the Server ***
+### 4. Launch the Server
 
 ```bash
 
@@ -51,7 +51,7 @@ java -Xmx1024M -Xms1024M -jar server.jar nogui
 
 ```
 
-### 5. ** Install Optifine or Fabric to add Mods and Shader Packs 
+### 5. Install Optifine or Fabric to add Mods and Shader Packs 
 
 You can find some [details here](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/installing-shader-packs.md).
 
