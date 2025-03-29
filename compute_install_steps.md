@@ -51,4 +51,8 @@ java -Xmx1024M -Xms1024M -jar server.jar nogui
 
 ```
 
-The next step for me is to get GeysterMC installed to have crossplay between Java and Bedrock.
+### 5. ** Install Optifine or Fabric to add Mods and Shader Packs 
+
+You can find some [details here](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/installing-shader-packs.md).
+
+
