@@ -50,6 +50,14 @@ nano eula.txt
 java -Xmx1024M -Xms1024M -jar server.jar nogui
 
 ```
+BUT if you are using something like Fabric or Optifine, you would actually launch the server using this command:
+
+```bash
+java -Xmx2G -Xms1G -jar fabric-server-launch.jar nogui
+
+```
+
+It's the same if you launch it on the client side.  You will have different profiles. It's the same on the server.  
 
 ### 5. Install Optifine or Fabric to add Mods and Shader Packs 
 
@@ -58,3 +66,7 @@ You can find some [details here](https://github.com/shevonnepolastre/minecraft-a
 ### 6. Install Geyser MC for Cross Playing with Bedrock Players
 
 Guide [here](https://github.com/shevonnepolastre/minecraft-azure-lab/blob/main/docs/bedrock-support.md). 
+
+I installed the Fabric mod.  However, there is a standalone version.  I tried the standalone, but the only thing is that when you restart the VM again, you have to restart Geyser separately, and then it has to be on a separate terminal screen.  It's a small inconvenience, but I prefer launching everything all at once. 
+
+
