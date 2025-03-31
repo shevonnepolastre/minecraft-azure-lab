@@ -15,3 +15,15 @@ scp ~/Downloads/geyser-fabric-*.jar mcadmin@[enter your public IP here]:~/[If th
 ```
 
 Geyster MC should be installed, and I was able to play with my preschooler while I was on the Java version and he was on his tablet on Bedrock.
+
+### Lessons Learned
+
+The next day I tried launching it and it wouldn't work.  I then tried installing the standalone version, but then I had to restart it separate from Minecraft because it didn't automatically start, and it's because I had stopped the VM. I realized I was using the wrong command to start Minecraft.  I had to use the command that included fabric, and not the standard one.  Even after launching it, I still couldn't get Bedrock to work.  I removed it after I realized my error, and it worked! 
+
+Reminder to remove a directory in bash, you have to use recursive so:
+
+```bash
+
+rm -rf
+
+```
