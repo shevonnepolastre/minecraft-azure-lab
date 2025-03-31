@@ -24,6 +24,6 @@ Reminder to remove a directory in bash, you have to use recursive so:
 
 ```bash
 
-rm -rf
+rm -rf [directory]
 
 ```
