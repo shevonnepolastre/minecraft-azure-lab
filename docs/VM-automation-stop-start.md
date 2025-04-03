@@ -48,3 +48,27 @@ Write-Output "Stopping $($vm.Name)";
  }
 }
 ```
+
+Starting the VM
+
+```powershell
+Param(
+    [string]$resourceGroup = "MinecraftRG",
+    [string]$vmName = "minecraft-vm"
+)
+
+Disable-AzContextAutosave -Scope Process
+
+# Connect using User-assigned Managed Identity
+$clientId = "[client ID]"
+Connect-AzAccount -Identity -AccountId $clientId
+
+$subscriptionId = "[subscription ID]"
+$AzureContext = Set-AzContext -SubscriptionId $subscriptionId
+
+Start-AzVM -ResourceGroupName $resourceGroup -Name $vmName -DefaultProfile $AzureContext
+```
+### Add to Runbooks
+In the Automation Account, select Runbooks.  In there, you will paste the code.  On the sidebar, then go to Schedule.  Select a schedule that works for you.  
+
+You have successfully created runbooks to stop and start your VMs
