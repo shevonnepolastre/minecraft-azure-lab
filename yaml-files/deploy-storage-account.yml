@@ -1,0 +1,43 @@
+
+name: Deploy Minecraft Storage Account
+
+on: [push]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  # lint:
+  #   name: Lint Bicep Templates
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout Repository
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0
+  #
+  #     - name: Run Bicep Linter
+  #       uses: synergy-au/bicep-lint-action@v1
+  #       with:
+  #         analyse-all-files: "true"
+  #         bicep-version: "latest"
+
+  deploy:
+    name: Build and Deploy Storage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy Bicep to Resource Group
+        run: |
+          az deployment group create \
+            --resource-group MinecraftRG \
+            --template-file infrastructure/storage.bicep \
+            --parameters storagePrefix=mystore storageSKU=Standard_LRS
