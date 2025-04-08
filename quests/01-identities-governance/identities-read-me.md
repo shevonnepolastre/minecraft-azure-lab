@@ -254,11 +254,56 @@ foreach ($groupName in $groupNames) {
     }
 }
 
-# Import CSV File
+# Import CSV file
 
 Instead of creating users one-by-one, add them all into a [CSV file]( and then import into this script to have the users you want to create. 
 
+# Create users
+
+After importing the file, you can now create the users. This code is similar to what I used for creating the groups.
+
+```powershell
+
+foreach ($user in $users) {
+    try {
+        # Check if user already exists
+        $existingUser = Get-MgUser -Filter "userPrincipalName eq '$($user.UserPrincipalName)'" -ErrorAction SilentlyContinue
+        if ($existingUser) {
+            Write-Host "User $($user.UserPrincipalName) already exists. Skipping..." -ForegroundColor Yellow
+            continue
+        }
+
+        # Create user
+        Write-Host "Creating user: $($user.UserPrincipalName)" -ForegroundColor Cyan
+        $newUser = New-MgUser -DisplayName $user.DisplayName `
+                              -UserPrincipalName $user.UserPrincipalName `
+                              -PasswordProfile @{
+                                  Password = $user.Password;
+                                  ForceChangePasswordNextSignIn = $true
+                              } `
+                              -AccountEnabled:$true `
+                              -MailNickname $user.MailNickname
 
 
+```
+
+# Add to group
+
+We have created our groups and users.  It's now time to add those users into their groups.  
+
+```powershell
+ $groupName = $user.Group
+        if ($newUser -ne $null -and $groupMap.ContainsKey($groupName)) {
+            Write-Host "Adding $($user.DisplayName) to $groupName group"
+            New-MgGroupMember -GroupId $groupMap[$groupName] -DirectoryObjectId $newUser.Id
+        } else {
+            Write-Host "User $($user.DisplayName) could not be added to group $groupName" -ForegroundColor Yellow
+        }
+```
+
+You have your hashtable with the group IDs.  It will be for each user.  If the new user is not existing, then it will be added as a member of its related group.  If not, you will be a message (Write-Host are outputs) that say that the user could be not be added. 
 
 
+# My experience 
+
+The only way to learn is trial and error, and then trying to figure out what went wrong.  I made five iterations of the CSV file because I had forgotten key data in the previous four.  Additionally, my original script created the groups and users, but it would not add the users to the groups.  Using the hashtable helped tremendously because I was having trouble getting the group ID.  
