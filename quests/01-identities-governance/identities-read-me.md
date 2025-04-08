@@ -12,25 +12,25 @@ Each has three users underneath them.
 
 The names for the three villagers are:
 
-1. Anne Butcher, anne.butcher@mcvillage.com
-2. John Farmer, john.farmer@mcvillage.com
-3. Tom Armorer, tom.armorer@mcvillage.com
+1. Anne Butcher, anne.butcher@spolastrelive.onmicrosoft.com
+2. John Farmer, john.farmer@spolastrelive.onmicrosoft.com
+3. Tom Armorer, tom.armorer@spolastrelive.onmicrosoft.com
 
 ## Endermen Users
 
 The names of the three endermen are:
 
-1. Rob Ender, rob.ender@mcender.com
-2. Lucy Ender, lucy.ender@mcender.com
-3. Izzy Ender. izzy.ender@mcender.com
+1. Rob Ender, rob.ender@spolastrelive.onmicrosoft.com
+2. Lucy Ender, lucy.ender@spolastrelive.onmicrosoft.com
+3. Izzy Ender. izzy.ender@spolastrelive.onmicrosoft.com
 
 ## Piglin Users 
 
 The names of the three piglin users are:
 
-1. Tom Piglin, tom.piglin@mcpiglin.com
-2. Alan Piglin, alan.piglin@mcpiglin.com
-3. Bo Piglin, bo.piglin@mcpiglin.com
+1. Tom Piglin, tom.piglin@spolastrelive.onmicrosoft.com
+2. Alan Piglin, alan.piglin@spolastrelive.onmicrosoft.com
+3. Bo Piglin, bo.piglin@spolastrelive.onmicrosoft.com
 
 # MS Graph
 
