@@ -27,7 +27,7 @@ foreach ($groupName in $groupNames) {
 }
 
 # Load users from CSV file in your local Downloads folder (update username if needed)
-$csvPath = "/Users/shevonnepolastre/Downloads/create_usersv5.csv"
+$csvPath = "/Users/shevonnepolastre/Downloads/create_users.csv"
 $users = Import-Csv $csvPath
 
 foreach ($user in $users) {
