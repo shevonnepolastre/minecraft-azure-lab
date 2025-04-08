@@ -1,70 +1,65 @@
-# Connect to Azure and MS Graph
-Connect-AzAccount
-Set-AzContext -Subscription "Your Subscription Name or ID"
-Connect-MgGraph -Scopes "User.ReadWrite.All", "Group.ReadWrite.All"
+# Connect to Microsoft Graph with required permissions
+Connect-MgGraph -Scopes "User.ReadWrite.All", "Group.ReadWrite.All", "Directory.ReadWrite.All"
 
-# Create security groups
-$villagers = New-MgGroup -DisplayName "Villagers" `
-                         -MailEnabled:$false `
-                         -MailNickname "villagers" `
-                         -SecurityEnabled:$true `
-                         -GroupTypes @()
+# Import specific Microsoft Graph modules
+Import-Module Microsoft.Graph.Users
+Import-Module Microsoft.Graph.Groups
+Import-Module Microsoft.Graph.DirectoryObjects
 
-$endermen = New-MgGroup -DisplayName "Endermen" `
-                        -MailEnabled:$false `
-                        -MailNickname "endermen" `
-                        -SecurityEnabled:$true `
-                        -GroupTypes @()
+# Define the groups to create
+$groupNames = @("Villagers", "Endermen", "Piglins")
+$groupMap = @{}
 
-$piglins = New-MgGroup -DisplayName "Piglins" `
-                       -MailEnabled:$false `
-                       -MailNickname "piglins" `
-                       -SecurityEnabled:$true `
-                       -GroupTypes @()
+foreach ($groupName in $groupNames) {
+    try {
+        $group = New-MgGroup -DisplayName $groupName `
+                             -MailEnabled:$false `
+                             -MailNickname $groupName.ToLower() `
+                             -SecurityEnabled:$true `
+                             -GroupTypes @()
+        $groupMap[$groupName] = $group.Id
+        Write-Host "Created group: $groupName" -ForegroundColor Green
+    } catch {
+        Write-Host "Group $groupName may already exist. Skipping..." -ForegroundColor Yellow
+        $existing = Get-MgGroup -Filter "displayName eq '$groupName'"
+        $groupMap[$groupName] = $existing.Id
+    }
+}
 
-# Import users from CSV
-$csvPath = "$HOME/Downloads/create_users.csv"
+# Load users from CSV file in your local Downloads folder (update username if needed)
+$csvPath = "/Users/shevonnepolastre/Downloads/create_usersv5.csv"
 $users = Import-Csv $csvPath
 
 foreach ($user in $users) {
     try {
-        # Create the user
-        New-MgUser -UserPrincipalName $user.UserPrincipalName -DisplayName $user.DisplayName -PasswordProfile @{
-            Password = $user.Password
-            ForceChangePasswordNextLogin = $false
-        } -AccountEnabled $false
+        # Check if user already exists
+        $existingUser = Get-MgUser -Filter "userPrincipalName eq '$($user.UserPrincipalName)'" -ErrorAction SilentlyContinue
+        if ($existingUser) {
+            Write-Host "User $($user.UserPrincipalName) already exists. Skipping..." -ForegroundColor Yellow
+            continue
+        }
 
-        Write-Host "User $($user.UserPrincipalName) created successfully." -ForegroundColor Green
+        # Create user
+        Write-Host "Creating user: $($user.UserPrincipalName)" -ForegroundColor Cyan
+        $newUser = New-MgUser -DisplayName $user.DisplayName `
+                              -UserPrincipalName $user.UserPrincipalName `
+                              -PasswordProfile @{
+                                  Password = $user.Password;
+                                  ForceChangePasswordNextSignIn = $true
+                              } `
+                              -AccountEnabled:$true `
+                              -MailNickname $user.MailNickname
+
+        # Add to group
+        $groupName = $user.Group
+        if ($newUser -ne $null -and $groupMap.ContainsKey($groupName)) {
+            Write-Host "Adding $($user.DisplayName) to $groupName group"
+            New-MgGroupMember -GroupId $groupMap[$groupName] -DirectoryObjectId $newUser.Id
+        } else {
+            Write-Host "User $($user.DisplayName) could not be added to group $groupName" -ForegroundColor Yellow
+        }
+
+    } catch {
+        Write-Host "❌ Error creating user $($user.UserPrincipalName): $($_.Exception.Message)" -ForegroundColor Red
     }
-    catch {
-        Write-Host "Error creating user $($user.UserPrincipalName): $($_.Exception.Message)" -ForegroundColor Red
-    }
 }
-
-# Add users to groups by domain
-$villagerUsers = Get-MgUser -Filter "endsWith(userPrincipalName,'@mcvillage.com')" `
-                            -ConsistencyLevel eventual `
-                            -CountVariable temp
-
-foreach ($user in $villagerUsers) {
-    New-MgGroupMember -GroupId $villagers.Id -DirectoryObjectId $user.Id
-}
-
-$endermenUsers = Get-MgUser -Filter "endsWith(userPrincipalName,'@mcender.com')" `
-                            -ConsistencyLevel eventual `
-                            -CountVariable temp
-
-foreach ($user in $endermenUsers) {
-    New-MgGroupMember -GroupId $endermen.Id -DirectoryObjectId $user.Id
-}
-
-$piglinUsers = Get-MgUser -Filter "endsWith(userPrincipalName,'@mcpiglin.com')" `
-                           -ConsistencyLevel eventual `
-                           -CountVariable temp
-
-foreach ($user in $piglinUsers) {
-    New-MgGroupMember -GroupId $piglins.Id -DirectoryObjectId $user.Id
-}
-
-
-
