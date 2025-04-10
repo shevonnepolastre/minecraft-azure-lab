@@ -1,0 +1,25 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-08-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "workspaceName": {
+        "value": "minecraft-logs"
+      },
+      "sku": {
+        "value": "pergb2018"
+      },
+      "location": {
+        "value": "eastus2"
+      },
+      "retentionInDays": {
+        "value": 30
+      },
+      "resourcePermissions": {
+        "value": true
+      },
+      "heartbeatTableRetention": {
+        "value": 30
+      }
+    }
+  }
+  
