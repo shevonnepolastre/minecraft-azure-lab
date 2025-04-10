@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "workspaceName": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the name of the Log Analytics workspace."
+      }
+    },
+    "sku": {
+      "type": "string",
+      "defaultValue": "pergb2018",
+      "allowedValues": [
+        "pergb2018",
+        "Free",
+        "Standalone",
+        "PerNode",
+        "Standard",
+        "Premium"
+      ],
+      "metadata": {
+        "description": "Pricing tier."
+      }
+    },
+    "location": {
+      "type": "string",
+      "metadata": {
+        "description": "Specifies the location for the workspace."
+      }
+    },
+    "retentionInDays": {
+      "type": "int",
+      "defaultValue": 120,
+      "metadata": {
+        "description": "Number of days to retain data."
+      }
+    },
+    "resourcePermissions": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "true to use resource or workspace permissions. false to require workspace permissions."
+      }
+    },
+    "heartbeatTableRetention": {
+      "type": "int",
+      "defaultValue": 30,
+      "metadata": {
+        "description": "Number of days to retain data in Heartbeat table."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2023-09-01",
+      "name": "[parameters('workspaceName')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "[parameters('sku')]"
+        },
+        "retentionInDays": "[parameters('retentionInDays')]",
+        "features": {
+          "enableLogAccessUsingOnlyResourcePermissions": "[parameters('resourcePermissions')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.OperationalInsights/workspaces/tables",
+      "apiVersion": "2022-10-01",
+      "name": "[format('{0}/{1}', parameters('workspaceName'), 'Heartbeat')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', parameters('workspaceName'))]"
+      ],
+      "properties": {
+        "retentionInDays": "[parameters('heartbeatTableRetention')]"
+      }
+    }
+  ]
+}
