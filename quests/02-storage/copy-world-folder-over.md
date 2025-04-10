@@ -11,10 +11,15 @@ azcopy --version
 
 I then used the AzCopy command: 
 
+```powershell
+
 azcopy copy azurevmdirectory blobstorageappendedwithSAS
 
-I got the following output 
+```
 
+I got the following output:
+
+```
 mcadmin@minecraft-vm:~$ azcopy copy "/home/mcadmin/world/*" "https://storageaccount.blob.core.windows.net/worldstorageSAS" --recursive=true
 INFO: Scanning...
 INFO: Any empty folders will not be processed, because source and/or destination doesn't have full folder support
@@ -40,8 +45,12 @@ Number of File Transfers Skipped: 0
 Number of Folder Transfers Skipped: 0
 Total Number of Bytes Transferred: 55028831
 Final Job Status: Completed
+```
+
 
 Used grep to search for "success" and got the following:
+
+```
 
 mcadmin@minecraft-vm:~$ grep -i success /home/mcadmin/.azcopy/8e6fd446-8a25-f24a-6201-d52b644a87d2.log
 2025/04/10 03:22:47 ==> REQUEST/RESPONSE (Try=1/5.410184ms, OpTime=21.550536ms) -- RESPONSE SUCCESSFULLY RECEIVED
@@ -97,6 +106,7 @@ mcadmin@minecraft-vm:~$ grep -i success /home/mcadmin/.azcopy/8e6fd446-8a25-f24a
 2025/04/10 03:22:47 ==> REQUEST/RESPONSE (Try=1/7.8µs, OpTime=62.760977ms) -- RESPONSE SUCCESSFULLY RECEIVED
 2025/04/10 03:22:47 ==> REQUEST/RESPONSE (Try=1/10.9µs, OpTime=93.627057ms) -- RESPONSE SUCCESSFULLY RECEIVED
 2025/04/10 03:22:47 all parts of entire Job 8e6fd446-8a25-f24a-6201-d52b644a87d2 successfully completed, cancelled or paused
+```
 
 # Future updates - Using Cron
 
