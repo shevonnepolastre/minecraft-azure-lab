@@ -48,3 +48,14 @@ ConnectionString    : BlobEndpoint=https://storageaccountname.blob.core.windows.
                       re.windows.net/;TableEndpoint=https://storageaccountname.table.core.windows.net/;FileEndpoint=https://storageaccountname
                       2kuwb4em.file.core.windows.net/;AccountName=storageaccountname;AccountKey=randomlettersandnumbers==
 ExtendedProperties  : {}
+
+I then expanded on it (Please see the [powershell script](https://github.com/shevonnepolastre/minecraft-azure-quests/blob/main/quests/02-storage/create-blob-container.ps1))
+
+I did have to temporarily enable Public IP.  You would use the Add-AzStorageAccountNetworkRule.
+Also, I have to add the secod key.  After that I got the following:
+
+Name                 PublicAccess         LastModified                   IsDeleted  VersionId
+----                 ------------         ------------                   ---------  ---------
+worldstorage         Off                  4/10/2025 2:38:29 AM +00:00         
+
+
